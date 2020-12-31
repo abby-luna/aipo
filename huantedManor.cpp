@@ -19,7 +19,7 @@ void printArr(std::string x, int sizeOfArr){
 
 }
 
-int walk(std::string *grid, int x, int y, int w, char dirrection){
+int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror = false){
 
     static int theNumber = 0;
     int returnN = 0;
@@ -27,94 +27,154 @@ int walk(std::string *grid, int x, int y, int w, char dirrection){
     switch (dirrection) {
         case 'd':
         for (size_t i = 0; i < w; i++) {
-            if(y+i == w){
+
+
+            if(y+i >= w){
                 break;
             }
 
             if(grid[y+i][x] == '.'){
+
                 theNumber++;
+                /*
+                if(hitMirror){
 
-            }else if(grid[y+i][x] == '/'){
+                    grid[y+i][x] = 'G';
 
-                return walk(grid,x+1,y+i,w,'l');
-                break;
+                }else{
+                    grid[y+i][x] = 'V';
+                }
+                */
 
-            }else if(grid[y+i][x] == '\\'){
+            }
+            if(grid[y+i][x] == '/'){
 
-                return walk(grid,x-1,y+i,w,'r');
-                break;
+                return walk(grid, x-1, y+i,  w, 'r', true);
+
+            }
+            if(grid[y+i][x] == '\\'){
+                return walk(grid, x+1, y+i,  w, 'l', true);
 
             }
 
         }
+
         break;
 
         case 'u':
         for (size_t i = 0; i < w; i++) {
+
             if(y-i == -1){
                 break;
             }
 
             if(grid[y-i][x] == '.'){
                 theNumber++;
-            }else if(grid[y-i][x] == '/'){
-                return walk(grid,x+1,y-i,w,'r');
-                break;
+                /*
+                if(hitMirror){
 
-            }else if(grid[y-i][x] == '\\'){
+                    grid[y-i][x] = 'G';
 
-                return walk(grid,x-1,y-i,w,'l');
-                break;
+                }else{
+                    grid[y-i][x] = 'V';
+                }
+                */
 
             }
+            if(grid[y-i][x] == '/'){
+
+                return walk(grid, x+1, y-i,  w, 'l', true);
+
+            }
+            if(grid[y-i][x] == '\\'){
+                return walk(grid, x-1, y-i,  w, 'r', true);
+
+            }
+
         }
+
         break;
 
         case 'r':
+
+
         for (size_t i = 0; i < w; i++) {
-            if(x+i == w){
+
+
+            if(x-i == -1){
                 break;
             }
-            if(grid[y][x+i] == '.'){
+
+            if(grid[y][x-i] == '.'){
                 theNumber++;
-            }else if(grid[y][x+i] == '/'){
+                /*
+                if(hitMirror){
 
-                return walk(grid,x+i,y-1,w,'u');
-                break;
-            }else if(grid[y][x+i] == '\\'){
+                    grid[y][x-i] = 'G';
 
-                return walk(grid,x+i,y+1,w,'d');
-                break;
+                }else{
+                    grid[y][x-i] = 'V';
+                }
+                */
 
             }
+            if(grid[y][x-i] == '/'){
+
+                return walk(grid, x-i, y+1,  w, 'd', true);
+
+            }
+            if(grid[y][x-i] == '\\'){
+                return walk(grid, x-i, y-1,  w, 'u', true);
+
+            }
+
         }
+
+
         break;
 
         case 'l':
+
         for (size_t i = 0; i < w; i++) {
-            if(x-i == 0){
+
+
+            if(x+i == w){
                 break;
             }
-            if(grid[y][x-i] == '.'){
+
+            if(grid[y][x+i] == '.'){
                 theNumber++;
-            }else if(grid[y][x-i] == '/'){
+                /*
+                if(hitMirror){
 
-                return walk(grid,x-i,y-1,w,'u');
-                break;
-            }else if(grid[y][x-i] == '\\'){
+                    grid[y][x+i] = 'G';
 
-                return walk(grid,x-i,y-1,w,'d');
-                break;
+                }else{
+                    grid[y][x+i] = 'V';
+                }
+                */
 
             }
+            if(grid[y][x+i] == '/'){
+
+                return walk(grid, x+i, y-1,  w, 'u', true);
+
+            }
+            if(grid[y][x+i] == '\\'){
+                return walk(grid, x+i, y+1,  w, 'd', true);
+
+            }
+
         }
+
+
         break;
 
     }
 
     returnN = theNumber;
     theNumber = 0;
-    
+
     return returnN;
 
 }
@@ -128,26 +188,26 @@ std::string *definteHit(std::string *grid, int w, int h, int top[], int bottom[]
 
     // std::string newGrid = grid;
 
+    std::cout << grid[2][2] << "\n";
 
+    // int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror = false){
     for (size_t i = 0; i < w; i++) {
         // top
-        std::cout << walk(grid, w, w-1, w, 'd') << "\n";
+        std::cout << walk(grid,i,0,w,'d') << '\n';
 
     }
     for (size_t i = 0; i < w; i++) {
-        // bottom
-        std::cout << walk(grid, 0, w-1, w, 'u') << "\n";
+
+        std::cout << walk(grid,i,w-1,w,'u') << '\n';
 
     }
     for (size_t i = 0; i < h; i++) {
-        // right
-        std::cout << walk(grid, i, 0, w, 'l') << "\n";
+
+        std::cout << walk(grid,0,i,w,'l') << '\n';
 
     }
     for (size_t i = 0; i < h; i++) {
-        // left
-        std::cout << walk(grid, w-i, 0, w, 'r') << "\n";
-
+        std::cout << walk(grid,w-1,i,w,'r') << '\n';
 
     }
 
