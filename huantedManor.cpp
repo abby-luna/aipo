@@ -52,6 +52,212 @@ void OverLay(std::string *overret, std::string *over2, int w){
 
 }
 
+bool verifyLine(std::string *grid, int x, int y, int w, char dirrection,int monsterNum, bool hitMirror = false){
+
+    static int theNumber = 0;
+    std::string *grid2 = StupidCopy(grid, w);
+
+    switch (dirrection) {
+        case 'd':
+        for (size_t i = 0; i < w; i++) {
+
+
+            if(y+i >= w){
+                break;
+            }
+
+            if(grid[y+i][x] == 'Z'){
+
+                theNumber++;
+
+            }else if(grid[y+i][x] == 'G'){
+                if(hitMirror){
+                    theNumber++;
+                }
+            }else if(grid[y+i][x] == 'V'){
+                if(!hitMirror){
+                    theNumber++;
+                }
+            }
+            if(grid[y+i][x] == '/'){
+
+                return verifyLine(grid2, x-1, y+i,  w, 'r',monsterNum, true);
+
+            }
+            if(grid[y+i][x] == '\\'){
+                return verifyLine(grid2, x+1, y+i,  w, 'l',monsterNum, true);
+
+            }
+
+        }
+
+        break;
+
+        case 'u':
+        for (size_t i = 0; i < w; i++) {
+
+            if(y-i == -1){
+                break;
+            }
+
+            if(grid[y-i][x] == 'Z'){
+
+                theNumber++;
+
+            }else if(grid[y-i][x] == 'G'){
+                if(hitMirror){
+                    theNumber++;
+                }
+            }else if(grid[y-i][x] == 'V'){
+                if(!hitMirror){
+                    theNumber++;
+                }
+            }
+            if(grid[y-i][x] == '/'){
+
+                return verifyLine(grid2, x+1, y-i,  w, 'l',monsterNum, true);
+
+            }
+            if(grid[y-i][x] == '\\'){
+                return verifyLine(grid2, x-1, y-i,  w, 'r',monsterNum, true);
+
+            }
+
+        }
+
+        break;
+
+        case 'r':
+
+
+        for (size_t i = 0; i < w; i++) {
+
+
+            if(x-i == -1){
+                break;
+            }
+
+            if(grid[y][x-i] == 'Z'){
+
+                theNumber++;
+
+            }else if(grid[y][x-i] == 'G'){
+                if(hitMirror){
+                    theNumber++;
+                }
+            }else if(grid[y][x-i] == 'V'){
+                if(!hitMirror){
+                    theNumber++;
+                }
+            }
+            if(grid[y][x-i] == '/'){
+
+                return verifyLine(grid2, x-i, y+1,  w, 'd',monsterNum, true);
+
+            }
+            if(grid[y][x-i] == '\\'){
+                return verifyLine(grid2, x-i, y-1,  w, 'u',monsterNum, true);
+
+            }
+
+        }
+
+
+        break;
+
+        case 'l':
+
+        for (size_t i = 0; i < w; i++) {
+
+
+            if(x+i == w){
+                break;
+            }
+
+            if(grid[y][x+i] == 'Z'){
+
+                theNumber++;
+
+            }else if(grid[y][x+i] == 'G'){
+                if(hitMirror){
+                    theNumber++;
+                }
+            }else if(grid[y][x+i] == 'V'){
+                if(!hitMirror){
+                    theNumber++;
+                }
+            }
+            if(grid[y][x+i] == '/'){
+
+                return verifyLine(grid2, x+i, y-1,  w, 'u',monsterNum, true);
+
+            }
+            if(grid[y][x+i] == '\\'){
+                return verifyLine(grid2, x+i, y+1,  w, 'd',monsterNum, true);
+
+            }
+
+        }
+
+
+        break;
+
+    }
+    int saved = theNumber;
+    theNumber= 0;
+
+    if(saved == monsterNum){
+        return true;
+
+    }else{
+        return false;
+
+    }
+
+}
+
+bool verify(std::string *grid, int w, int top[], int bottom[], int left[], int right[]){
+    // int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror = false){
+    for (size_t i = 0; i < w; i++) {
+        // top
+        bool line = verifyLine(grid,i,0,w,'d',top[i]);
+        if(!line){
+            return line;
+        }
+    }
+
+
+    for (size_t i = 0; i < w; i++) {
+
+        bool line = verifyLine(grid,i,w-1,w,'u', bottom[i]);
+        if(!line){
+            return line;
+        }
+    }
+
+
+    for (size_t i = 0; i < w; i++) {
+
+        bool line = verifyLine(grid,w-1,i,w,'r', right[i]);
+        if(!line){
+            return line;
+        }
+
+    }
+
+    for (size_t i = 0; i < w; i++) {
+        bool line = verifyLine(grid,0,i,w,'l', left[i]);
+        if(!line){
+            return line;
+        }
+    }
+
+    return true;
+
+
+}
+
+
 int max(int f, int s, int t){
 
     if(f > s & f > t){
@@ -64,17 +270,23 @@ int max(int f, int s, int t){
 
 }
 
-void generateAllGrids(std::string *grid, int w,  int zo, int gh, int va){
+void generateAllGrids(std::string *grid, int w,  int zo, int gh, int va, int top[], int bottom[], int left[], int right[]){
     std::string *grid2 = StupidCopy(grid, w);
 
     if(zo + gh + va == 0){
+        // bool verify(std::string *grid, int w, int top[], int bottom[], int left[], int right[], int zo, int gh, int va){
 
-        for (size_t i = 0; i < w; i++) {
-            std::cout << grid2[i] << "\n";
+        bool isValid = verify(grid2, w, top, bottom, left, right);
+        if(isValid){
+            for (size_t i = 0; i < w; i++) {
+                std::cout << grid2[i] << "\n";
+            }
+            exit(0);
+            return;
         }
     }else{
 
-        int maximum = max(zo, gh, va);
+        int maximum = zo + gh + va;
 
         for (size_t i = 0; i < maximum; i++) {
             for (size_t j = 0; j < w; j++) {
@@ -82,15 +294,15 @@ void generateAllGrids(std::string *grid, int w,  int zo, int gh, int va){
                     if(grid2[j][k] == '.'){
                         if(zo > 0){
                             grid2[j][k] = 'Z';
-                            generateAllGrids(grid2, w, zo-1, gh, va);
+                            generateAllGrids(grid2, w, zo-1, gh, va, top, bottom, left, right);
                         }
                         if(gh > 0){
                             grid2[j][k] = 'G';
-                            generateAllGrids(grid2, w, zo, gh-1, va);
+                            generateAllGrids(grid2, w, zo, gh-1, va, top, bottom, left, right);
                         }
                         if(va > 0){
                             grid2[j][k] = 'V';
-                            generateAllGrids(grid2, w, zo, gh, va-1);
+                            generateAllGrids(grid2, w, zo, gh, va-1, top, bottom, left, right);
                         }
                     }
                 }
@@ -104,7 +316,7 @@ void generateAllGrids(std::string *grid, int w,  int zo, int gh, int va){
 }
 
 
-std::string *walk(std::string *grid, int x, int y, int w, char dirrection,int monsterNum, std::string *gridSave,bool hitMirror = false){
+std::string *walk(std::string *grid, int x, int y, int w, char dirrection,int monsterNum ,bool hitMirror = false){
 
     static int theNumber = 0;
     std::string *grid2 = StupidCopy(grid, w);
@@ -143,11 +355,11 @@ std::string *walk(std::string *grid, int x, int y, int w, char dirrection,int mo
             }
             if(grid[y+i][x] == '/'){
 
-                return walk(grid2, x-1, y+i,  w, 'r',monsterNum,gridSave, true);
+                return walk(grid2, x-1, y+i,  w, 'r',monsterNum, true);
 
             }
             if(grid[y+i][x] == '\\'){
-                return walk(grid2, x+1, y+i,  w, 'l',monsterNum,gridSave, true);
+                return walk(grid2, x+1, y+i,  w, 'l',monsterNum, true);
 
             }
 
@@ -185,11 +397,11 @@ std::string *walk(std::string *grid, int x, int y, int w, char dirrection,int mo
             }
             if(grid[y-i][x] == '/'){
 
-                return walk(grid2, x+1, y-i,  w, 'l',monsterNum,gridSave, true);
+                return walk(grid2, x+1, y-i,  w, 'l',monsterNum, true);
 
             }
             if(grid[y-i][x] == '\\'){
-                return walk(grid2, x-1, y-i,  w, 'r',monsterNum, gridSave, true);
+                return walk(grid2, x-1, y-i,  w, 'r',monsterNum, true);
 
             }
 
@@ -230,11 +442,11 @@ std::string *walk(std::string *grid, int x, int y, int w, char dirrection,int mo
             }
             if(grid[y][x-i] == '/'){
 
-                return walk(grid2, x-i, y+1,  w, 'd',monsterNum,gridSave, true);
+                return walk(grid2, x-i, y+1,  w, 'd',monsterNum, true);
 
             }
             if(grid[y][x-i] == '\\'){
-                return walk(grid2, x-i, y-1,  w, 'u',monsterNum,gridSave, true);
+                return walk(grid2, x-i, y-1,  w, 'u',monsterNum, true);
 
             }
 
@@ -274,11 +486,11 @@ std::string *walk(std::string *grid, int x, int y, int w, char dirrection,int mo
             }
             if(grid[y][x+i] == '/'){
 
-                return walk(grid2, x+i, y-1,  w, 'u',monsterNum,gridSave, true);
+                return walk(grid2, x+i, y-1,  w, 'u',monsterNum, true);
 
             }
             if(grid[y][x+i] == '\\'){
-                return walk(grid2, x+i, y+1,  w, 'd',monsterNum,gridSave, true);
+                return walk(grid2, x+i, y+1,  w, 'd',monsterNum, true);
 
             }
 
@@ -321,8 +533,8 @@ std::string *definteHit(std::string *grid, int w, int h, int top[], int bottom[]
 
     //void generateAllGrids(std::string *grid, int w,  int zo, int gh, int va){
 
-    generateAllGrids(grid, w, zo, gh, va);
-
+    generateAllGrids(grid, w, zo, gh, va, top, bottom, left, right);
+    /*
     std::string *finalGrid = grid;
 
     // int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror = false){
@@ -386,7 +598,7 @@ std::string *definteHit(std::string *grid, int w, int h, int top[], int bottom[]
     }
 
     // int walk(std::string *grid, int x, int y, int w, char dirrection){
-
+    */
     return grid;
 
 }
@@ -411,7 +623,6 @@ int main(){
   int w;
   std::cin >> w;
   std::cin >> h;
-
   int top[w];
   int bottom[w];
   int left[h];
