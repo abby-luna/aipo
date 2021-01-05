@@ -19,10 +19,95 @@ void printArr(std::string x, int sizeOfArr){
 
 }
 
-int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror = false){
+std::string *StupidCopy(std::string *Ele, int n){
+    std::string *Stupid = new std::string[n];
+
+    for (size_t i = 0; i < n; i++) {
+        Stupid[i] = Ele[i];
+    }
+    return Stupid;
+
+}
+
+void OverLay(std::string *overret, std::string *over2, int w){
+
+    for (size_t i = 0; i < w; i++) {
+        for (size_t j = 0; j < w; j++) {
+
+            if(overret[i][j] == '.'){
+                overret[i][j] = over2[i][j];
+            }else if(overret[i][j] == 'V'){
+                if (over2[i][j] == 'G'){
+                    overret[i][j] = 'Z';
+                }
+            }else if(over2[i][j] == 'V'){
+                if (overret[i][j] == 'G'){
+                    overret[i][j] = 'Z';
+                }
+            }
+
+        }
+    }
+
+
+}
+
+int max(int f, int s, int t){
+
+    if(f > s & f > t){
+        return f;
+    }else if(s > f & s > t){
+        return s;
+    }else{
+        return t;
+    }
+
+}
+
+void generateAllGrids(std::string *grid, int w,  int zo, int gh, int va){
+    std::string *grid2 = StupidCopy(grid, w);
+
+    if(zo + gh + va == 0){
+
+        for (size_t i = 0; i < w; i++) {
+            std::cout << grid2[i] << "\n";
+        }
+    }else{
+
+        int maximum = max(zo, gh, va);
+
+        for (size_t i = 0; i < maximum; i++) {
+            for (size_t j = 0; j < w; j++) {
+                for (size_t k = 0; k < w; k++) {
+                    if(grid2[j][k] == '.'){
+                        if(zo > 0){
+                            grid2[j][k] = 'Z';
+                            generateAllGrids(grid2, w, zo-1, gh, va);
+                        }
+                        if(gh > 0){
+                            grid2[j][k] = 'G';
+                            generateAllGrids(grid2, w, zo, gh-1, va);
+                        }
+                        if(va > 0){
+                            grid2[j][k] = 'V';
+                            generateAllGrids(grid2, w, zo, gh, va-1);
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+
+
+}
+
+
+std::string *walk(std::string *grid, int x, int y, int w, char dirrection,int monsterNum, std::string *gridSave,bool hitMirror = false){
 
     static int theNumber = 0;
-    int returnN = 0;
+    std::string *grid2 = StupidCopy(grid, w);
 
     switch (dirrection) {
         case 'd':
@@ -36,24 +121,33 @@ int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror
             if(grid[y+i][x] == '.'){
 
                 theNumber++;
-                /*
-                if(hitMirror){
+                if(monsterNum == 0){
+                    if(hitMirror){
 
-                    grid[y+i][x] = 'G';
+                        grid2[y+i][x] = 'V';
 
+                    }else{
+                        grid2[y+i][x] = 'G';
+                    }
                 }else{
-                    grid[y+i][x] = 'V';
+                    if(hitMirror){
+
+                        grid2[y+i][x] = 'G';
+
+                    }else{
+                        grid2[y+i][x] = 'V';
+                    }
                 }
-                */
+
 
             }
             if(grid[y+i][x] == '/'){
 
-                return walk(grid, x-1, y+i,  w, 'r', true);
+                return walk(grid2, x-1, y+i,  w, 'r',monsterNum,gridSave, true);
 
             }
             if(grid[y+i][x] == '\\'){
-                return walk(grid, x+1, y+i,  w, 'l', true);
+                return walk(grid2, x+1, y+i,  w, 'l',monsterNum,gridSave, true);
 
             }
 
@@ -70,24 +164,32 @@ int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror
 
             if(grid[y-i][x] == '.'){
                 theNumber++;
-                /*
-                if(hitMirror){
+                if(monsterNum == 0){
+                    if(hitMirror){
 
-                    grid[y-i][x] = 'G';
+                        grid2[y-i][x] = 'V';
 
+                    }else{
+                        grid2[y-i][x] = 'G';
+                    }
                 }else{
-                    grid[y-i][x] = 'V';
+                    if(hitMirror){
+
+                        grid2[y-i][x] = 'G';
+
+                    }else{
+                        grid2[y-i][x] = 'V';
+                    }
                 }
-                */
 
             }
             if(grid[y-i][x] == '/'){
 
-                return walk(grid, x+1, y-i,  w, 'l', true);
+                return walk(grid2, x+1, y-i,  w, 'l',monsterNum,gridSave, true);
 
             }
             if(grid[y-i][x] == '\\'){
-                return walk(grid, x-1, y-i,  w, 'r', true);
+                return walk(grid2, x-1, y-i,  w, 'r',monsterNum, gridSave, true);
 
             }
 
@@ -107,24 +209,32 @@ int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror
 
             if(grid[y][x-i] == '.'){
                 theNumber++;
-                /*
-                if(hitMirror){
+                if(monsterNum == 0){
+                    if(hitMirror){
 
-                    grid[y][x-i] = 'G';
+                        grid2[y][x-i] = 'V';
 
+                    }else{
+                        grid2[y][x-i] = 'G';
+                    }
                 }else{
-                    grid[y][x-i] = 'V';
+                    if(hitMirror){
+
+                        grid2[y][x-i] = 'G';
+
+                    }else{
+                        grid2[y][x-i] = 'V';
+                    }
                 }
-                */
 
             }
             if(grid[y][x-i] == '/'){
 
-                return walk(grid, x-i, y+1,  w, 'd', true);
+                return walk(grid2, x-i, y+1,  w, 'd',monsterNum,gridSave, true);
 
             }
             if(grid[y][x-i] == '\\'){
-                return walk(grid, x-i, y-1,  w, 'u', true);
+                return walk(grid2, x-i, y-1,  w, 'u',monsterNum,gridSave, true);
 
             }
 
@@ -144,24 +254,31 @@ int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror
 
             if(grid[y][x+i] == '.'){
                 theNumber++;
-                /*
-                if(hitMirror){
+                if(monsterNum == 0){
+                    if(hitMirror){
 
-                    grid[y][x+i] = 'G';
+                        grid2[y][x+i] = 'V';
 
+                    }else{
+                        grid2[y][x+i] = 'G';
+                    }
                 }else{
-                    grid[y][x+i] = 'V';
-                }
-                */
+                    if(hitMirror){
 
+                        grid2[y][x+i] = 'G';
+
+                    }else{
+                        grid2[y][x+i] = 'V';
+                    }
+                }
             }
             if(grid[y][x+i] == '/'){
 
-                return walk(grid, x+i, y-1,  w, 'u', true);
+                return walk(grid2, x+i, y-1,  w, 'u',monsterNum,gridSave, true);
 
             }
             if(grid[y][x+i] == '\\'){
-                return walk(grid, x+i, y+1,  w, 'd', true);
+                return walk(grid2, x+i, y+1,  w, 'd',monsterNum,gridSave, true);
 
             }
 
@@ -171,11 +288,25 @@ int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror
         break;
 
     }
+    int saved = theNumber;
+    theNumber= 0;
 
-    returnN = theNumber;
-    theNumber = 0;
+    if(saved == monsterNum){
 
-    return returnN;
+        std::cout << "hit\n";
+        return grid2;
+
+    }else if(monsterNum == 0){
+
+        std::cout << "hit2\n";
+
+        return grid2;
+
+    }else{
+        std::cout << "hit3\n";
+        return NULL;
+
+    }
 
 }
 
@@ -188,29 +319,71 @@ std::string *definteHit(std::string *grid, int w, int h, int top[], int bottom[]
 
     // std::string newGrid = grid;
 
-    std::cout << grid[2][2] << "\n";
+    //void generateAllGrids(std::string *grid, int w,  int zo, int gh, int va){
+
+    generateAllGrids(grid, w, zo, gh, va);
+
+    std::string *finalGrid = grid;
 
     // int walk(std::string *grid, int x, int y, int w, char dirrection, bool hitMirror = false){
     for (size_t i = 0; i < w; i++) {
         // top
-        std::cout << walk(grid,i,0,w,'d') << '\n';
+        std::string *currentGrid = walk(grid,i,0,w,'d',top[i], grid);
+        if(currentGrid != NULL){
+            OverLay(finalGrid, currentGrid, w);
+            for (size_t j = 0; j < w; j++) {
+
+                std::cout << currentGrid[j] << "\n";
+
+            }
+
+        }
+
 
     }
+
+
     for (size_t i = 0; i < w; i++) {
 
-        std::cout << walk(grid,i,w-1,w,'u') << '\n';
+        std::string *currentGrid = walk(grid,i,w-1,w,'u', bottom[i], grid);
+        if(currentGrid != NULL){
+            OverLay(finalGrid, currentGrid, w);
 
+            for (size_t j = 0; j < w; j++) {
+                std::cout << currentGrid[j] << "\n";
+
+            }
+        }
     }
     for (size_t i = 0; i < h; i++) {
 
-        std::cout << walk(grid,0,i,w,'l') << '\n';
+        std::string *currentGrid = walk(grid,0,i,w,'l', left[i], grid);
+        if(currentGrid != NULL){
+            OverLay(finalGrid, currentGrid, w);
+
+            for (size_t j = 0; j < w; j++) {
+                std::cout << currentGrid[j] << "\n";
+            }
+        }
 
     }
     for (size_t i = 0; i < h; i++) {
-        std::cout << walk(grid,w-1,i,w,'r') << '\n';
+        std::string *currentGrid = walk(grid,w-1,i,w,'r', left[i], grid);
+        if(currentGrid != NULL){
+            OverLay(finalGrid, currentGrid, w);
 
+            for (size_t j = 0; j < w; j++) {
+                std::cout << currentGrid[j] << "\n";
+
+            }
+        }
     }
 
+
+    std::cout << "\n\n\nFinal Grid:\n";
+    for (size_t i = 0; i < w; i++) {
+        std::cout << finalGrid[i] << "\n";
+    }
 
     // int walk(std::string *grid, int x, int y, int w, char dirrection){
 
